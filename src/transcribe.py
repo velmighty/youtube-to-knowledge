@@ -37,10 +37,11 @@ def fetch_transcript(video_id: str, raw_dir: str) -> tuple[str, str]:
     # Method 1: YouTube Transcript API
     try:
         api = YouTubeTranscriptApi()
-        data = api.fetch(video_id, ["pl", "en"])
-        text = " ".join([t.text for t in data])
+        fetched = api.fetch(video_id, ["pl", "en"])
+        text = " ".join([t.text for t in fetched])
         if text.strip():
-            return text, "en"
+            lang = getattr(fetched, "language_code", "en") or "en"
+            return text, lang
     except Exception as e:
         print(f"Warning: YouTubeTranscriptApi failed: {e}")
 
@@ -51,7 +52,7 @@ def fetch_transcript(video_id: str, raw_dir: str) -> tuple[str, str]:
         "skip_download": True,
         "writeautomaticsub": True,
         "writesubtitles": True,
-        "subtitleslangs": ["en", "pl"],
+        "subtitleslangs": ["pl", "en"],
         "outtmpl": f"{raw_dir}/subs",
     }
     try:

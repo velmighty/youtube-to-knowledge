@@ -69,12 +69,13 @@ def main():
     print(f"Loading Whisper model '{args.model}'...")
     model = whisper.load_model(args.model)
     print("Transcribing...")
-    result = model.transcribe(temp_audio)
-    transcript = result["text"].strip()
-    lang = result.get("language", "unknown")
-
-    if os.path.exists(temp_audio):
-        os.remove(temp_audio)
+    try:
+        result = model.transcribe(temp_audio)
+        transcript = result["text"].strip()
+        lang = result.get("language", "unknown")
+    finally:
+        if os.path.exists(temp_audio):
+            os.remove(temp_audio)
 
     metadata["language"] = lang
 
