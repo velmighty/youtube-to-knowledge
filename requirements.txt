@@ -1,0 +1,5 @@
+yt-dlp>=2024.1.0
+youtube-transcript-api>=0.6.0
+openai-whisper>=20231117
+networkx>=3.0
+pyvis>=0.3.2
