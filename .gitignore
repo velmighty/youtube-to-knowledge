@@ -96,6 +96,8 @@ celerybeat.pid
 
 # Environments
 .env
+.env.*
+!.env.example
 .venv
 env/
 venv/
@@ -125,10 +127,19 @@ dmypy.json
 vault/content/
 vault/graphs/
 
-# Audio temp files
+# Audio/video temp files (yt-dlp downloads)
 *.m4a
 *.mp3
 *.webm
+*.mp4
+*.mkv
 
 # PyVis output (regenerated locally)
-*.html
+vault/**/*.html
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
