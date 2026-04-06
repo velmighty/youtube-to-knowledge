@@ -9,6 +9,7 @@ class GraphExtractor:
 
     def __init__(self, output_dir: str):
         self.output_dir = output_dir
+        os.makedirs(output_dir, exist_ok=True)
         self.graph = nx.DiGraph()
 
     def load_json(self, filename: str = "graph.json") -> bool:
@@ -16,10 +17,13 @@ class GraphExtractor:
         path = os.path.join(self.output_dir, filename)
         if not os.path.exists(path):
             return False
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except json.JSONDecodeError:
+            return False
         edge_key = "links" if "links" in data else "edges"
-        self.graph = nx.node_link_graph(data, edges=edge_key)
+        self.graph = nx.node_link_graph(data, directed=True, edges=edge_key)
         return True
 
     def add_triplet(self, subject: str, predicate: str, object_node: str) -> None:
@@ -66,8 +70,11 @@ if __name__ == "__main__":
     with open(triplets_file, "r", encoding="utf-8") as f:
         triplets = json.load(f)
 
-    for t in triplets:
-        extractor.add_triplet(t["subject"], t["predicate"], t["object"])
+    for i, t in enumerate(triplets):
+        try:
+            extractor.add_triplet(t["subject"], t["predicate"], t["object"])
+        except KeyError as e:
+            print(f"Warning: triplet {i} missing key {e}, skipping")
 
     extractor.save_json()
     html_path = extractor.generate_visualization()

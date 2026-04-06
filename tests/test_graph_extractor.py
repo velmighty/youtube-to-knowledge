@@ -46,4 +46,4 @@ def test_save_json_format(tmp_path):
     with open(tmp_path / "graph.json", encoding="utf-8") as f:
         data = json.load(f)
     assert "nodes" in data
-    assert "links" in data or "edges" in data
+    assert "links" in data
