@@ -1,6 +1,16 @@
 Process a YouTube video into structured knowledge.
 
-**URL:** $ARGUMENTS
+**Arguments:** $ARGUMENTS
+
+Parse `$ARGUMENTS` to extract:
+- **URL**: The argument that starts with `http` or looks like a YouTube video ID.
+- **--depth**: `light` | `standard` | `deep` (default: `standard`).
+- **--engine**: `whisperx` | `whisper` (default: `whisperx`).
+
+Examples:
+- `/process https://youtube.com/watch?v=xyz`
+- `/process --depth deep https://youtube.com/watch?v=xyz`
+- `/process --engine whisper --depth light https://youtube.com/watch?v=xyz`
 
 Follow these steps exactly:
 
@@ -8,31 +18,67 @@ Follow these steps exactly:
 Read `vault/processed_videos.md`. Extract the video ID from the URL. If the ID appears in the file, stop and tell the user the video is already processed.
 
 ## Step 2 — Transcription
-Run: `python src/transcribe.py $ARGUMENTS`
+Run: `python src/transcribe.py <URL>`
 
 Parse stdout for:
 - `CHANNEL_DIR:<path>`
 - `RAW_FILE:<path>`
 - `SOURCE_LANG:<lang>`
 - `TITLE:<title>`
+- `ENRICHED_FILE:<path>` (optional, only from WhisperX)
 
-If the script exits with error code 1 (no transcript found), run instead:
-`python src/transcribe_whisper.py $ARGUMENTS`
-Parse the same output variables.
+If the script exits with error code 1 (no transcript found):
+- If engine is `whisperx` (default): run `python src/transcribe_whisperx.py <URL>`
+- If engine is `whisper`: run `python src/transcribe_whisper.py <URL>`
+- If the chosen engine also fails, try the other as a last resort.
+
+Parse the same output variables from whichever script succeeds.
 
 ## Step 3 — Summary
-Read the full transcript from RAW_FILE.
+Read the transcript. **If ENRICHED_FILE was provided, read it instead of RAW_FILE** for richer context (timestamps, speaker labels). Otherwise read RAW_FILE.
 
 Write a structured summary to `<CHANNEL_DIR>/summary.md`:
-- Title and channel at the top
-- Key takeaways (5-8 bullet points)
-- Main arguments or strategies discussed
-- Notable quotes or data points
-- Write in the same language as the transcript (use SOURCE_LANG to detect)
+- Title and channel at the top.
+- Write in the same language as the transcript (use SOURCE_LANG to detect).
+
+**If depth = light:**
+- 3-5 key takeaways (concise bullet points).
+- One paragraph overview.
+
+**If depth = standard (default):**
+- 5-8 key takeaways.
+- Main arguments or strategies discussed.
+- Notable quotes or data points.
+
+**If depth = deep:**
+- 8-12 key takeaways.
+- Comprehensive argument breakdown with supporting evidence.
+- All notable quotes with timestamps (if available from enriched transcript).
+- Data points and statistics mentioned.
+- Counterarguments or caveats raised by the speaker.
+- Connections to other topics in the vault (check existing summaries).
 
 ## Step 4 — Knowledge graph
-Extract 15-20 subject-predicate-object triplets from the transcript.
-Focus on: people, companies, tools, concepts, and their relationships.
+Extract triplets from the transcript (prefer enriched transcript if available).
+
+**Entity resolution (all depths):**
+- Use full canonical names. Check metadata.json for speaker/channel.
+- Predicates must be specific verbs: "founded", "recommends", "competes_with". Never "is related to".
+- Before adding entities, check existing `<CHANNEL_DIR>/graph.json` for equivalent nodes.
+
+**If depth = light:**
+Extract 8-12 triplets. Primary entities and direct relationships only.
+
+**If depth = standard (default):**
+Extract 15-20 triplets. People, companies, tools, concepts, and their relationships.
+
+**If depth = deep:**
+Extract 25-35 triplets. Include:
+- Primary relationships (people, companies, tools, concepts)
+- Causal chains ("X leads to Y" = separate triplets)
+- Temporal relationships ("X preceded Y", "X replaced Y")
+- Attributed claims (use speaker name if from diarized transcript)
+- Quantitative relationships ("X grew by 300%")
 
 Save to `<CHANNEL_DIR>/triplets.json`:
 ```json
@@ -50,6 +96,8 @@ Run: `python src/generate_video_db.py`
 ## Step 6 — Report
 Tell the user:
 - Video title
+- Depth level used
 - Files created (transcript, summary, graph.html path)
+- Whether enriched transcript was available
 - Number of graph nodes and edges
 - How to open the graph: open `<CHANNEL_DIR>/graph.html` in a browser
