@@ -5,7 +5,7 @@ Process a YouTube video into structured knowledge.
 Parse `$ARGUMENTS` to extract:
 - **URL**: The argument that starts with `http` or looks like a YouTube video ID.
 - **--depth**: `light` | `standard` | `deep` (default: `standard`).
-- **--engine**: `whisperx` | `whisper` (default: `whisperx`).
+- **--engine**: `whisperx` | `whisper` (default: `whisper`).
 
 Examples:
 - `/process https://youtube.com/watch?v=xyz`
@@ -28,8 +28,8 @@ Parse stdout for:
 - `ENRICHED_FILE:<path>` (optional, only from WhisperX)
 
 If the script exits with error code 1 (no transcript found):
-- If engine is `whisperx` (default): run `python src/transcribe_whisperx.py <URL>`
-- If engine is `whisper`: run `python src/transcribe_whisper.py <URL>`
+- If engine is `whisper` (default): run `python src/transcribe_whisper.py <URL>`
+- If engine is `whisperx`: run `python src/transcribe_whisperx.py <URL>`
 - If the chosen engine also fails, try the other as a last resort.
 
 Parse the same output variables from whichever script succeeds.

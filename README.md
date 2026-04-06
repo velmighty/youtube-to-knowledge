@@ -61,6 +61,7 @@ graph.html              open in browser — interactive visualization
 |------|-------|-------------|
 | Fast (default) | Seconds | Video must have subtitles |
 | Whisper (local) | Minutes | Any video, no subtitles needed |
+| WhisperX (opt-in) | Minutes | `pip install -r requirements-whisperx.txt` |
 
 The `/process` command tries fast mode first and falls back to Whisper automatically. To force Whisper:
 
@@ -68,6 +69,41 @@ The `/process` command tries fast mode first and falls back to Whisper automatic
 python src/transcribe_whisper.py https://www.youtube.com/watch?v=VIDEO_ID
 ```
 
+### WhisperX mode
+
+WhisperX provides word-level timestamps, speaker diarization, and faster transcription via faster-whisper. Install the extra dependencies:
+
+```bash
+pip install -r requirements-whisperx.txt
+```
+
+Then use the `--engine` flag:
+
+```
+/process --engine whisperx https://www.youtube.com/watch?v=VIDEO_ID
+```
+
+Speaker diarization requires a [HuggingFace token](https://huggingface.co/settings/tokens) set as `HF_TOKEN` in your environment. Without it, WhisperX still produces timestamped segments but without speaker labels.
+
+## Options
+
+```
+/process [--depth light|standard|deep] [--engine whisperx|whisper] <URL>
+```
+
+| Flag | Values | Default | Effect |
+|------|--------|---------|--------|
+| `--depth` | `light`, `standard`, `deep` | `standard` | Controls triplet count and summary detail |
+| `--engine` | `whisper`, `whisperx` | `whisper` | Selects transcription engine for fallback |
+
+Examples:
+
+```
+/process https://www.youtube.com/watch?v=VIDEO_ID
+/process --depth deep https://www.youtube.com/watch?v=VIDEO_ID
+/process --engine whisperx --depth light https://www.youtube.com/watch?v=VIDEO_ID
+```
+
 ## License
 
-MIT
+[MIT](LICENSE)
