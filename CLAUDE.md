@@ -17,14 +17,11 @@ That's it. Claude handles the rest.
 3. A knowledge graph is built from entities and relationships
 4. Everything is saved to `vault/content/<channel_name>/`
 
-## Skills
+## Commands
 
-This project includes two custom skills:
-
-- **video_specialist** — for deep-dive questions about a specific video's content
-- **kg_navigator** — for exploring connections between entities across videos
-
-Claude loads these automatically when relevant questions are asked.
+- `/process <url>` — main command, processes a video end-to-end
+- `/video_specialist` — deep-dive questions about a specific video's content
+- `/kg_navigator` — explore connections between entities across videos
 
 ## Output structure
 

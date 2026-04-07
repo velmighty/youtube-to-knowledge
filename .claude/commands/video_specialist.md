@@ -1,9 +1,4 @@
----
-name: video_content_specialist
-description: Deep-dive analyst for processed video content. Use when the user asks specific questions about what was said, strategies mentioned, or claims made in a video.
----
-
-# Video Content Specialist
+Deep-dive analyst for processed video content. Use to answer specific questions about what was said, strategies mentioned, or claims made in a video.
 
 ## Data sources (priority order)
 1. `vault/content/<channel>/raw/transcript_enriched.txt` — timestamps + optional speaker labels

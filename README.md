@@ -41,6 +41,12 @@ Open the folder in Claude Code.
 /process https://www.youtube.com/watch?v=VIDEO_ID
 ```
 
+
+Additional commands:
+
+- `/video_specialist` — deep-dive questions about what was said in a processed video
+- `/kg_navigator` — explore entity connections across videos
+
 ## Output
 
 Files are saved to `vault/content/<channel_name>/`:

@@ -1,9 +1,4 @@
----
-name: knowledge_graph_navigator
-description: Knowledge graph specialist for entity relationships across videos. Use when the user asks about connections, relationships, or wants to build/query the graph.
----
-
-# Knowledge Graph Navigator
+Knowledge graph specialist for entity relationships across videos.
 
 ## Entity resolution
 - Use canonical full names: "Michał Sadowski" not "Mike". Check metadata.json for channel/speaker names.
