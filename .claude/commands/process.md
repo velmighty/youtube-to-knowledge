@@ -6,11 +6,13 @@ Parse `$ARGUMENTS` to extract:
 - **URL**: The argument that starts with `http` or looks like a YouTube video ID.
 - **--depth**: `light` | `standard` | `deep` (default: `standard`).
 - **--engine**: `whisperx` | `whisper` (default: `whisper`).
+- **--obsidian**: flag (no value). If present, export entities as Obsidian markdown notes.
 
 Examples:
 - `/process https://youtube.com/watch?v=xyz`
 - `/process --depth deep https://youtube.com/watch?v=xyz`
 - `/process --engine whisper --depth light https://youtube.com/watch?v=xyz`
+- `/process --obsidian https://youtube.com/watch?v=xyz`
 
 Follow these steps exactly:
 
@@ -93,6 +95,17 @@ Then run: `python src/graph_extractor.py <CHANNEL_DIR> <CHANNEL_DIR>/triplets.js
 ## Step 5 — Update database
 Run: `python src/generate_video_db.py`
 
+## Step 5.5 — Obsidian export (only if --obsidian flag was set)
+
+Read `<CHANNEL_DIR>/raw/metadata.json`.
+
+Run:
+```
+python src/obsidian_exporter.py <CHANNEL_DIR>/triplets.json <CHANNEL_DIR>/obsidian --metadata <CHANNEL_DIR>/raw/metadata.json
+```
+
+This creates one `.md` file per entity in `<CHANNEL_DIR>/obsidian/`, with `[[wikilinks]]` between related entities.
+
 ## Step 6 — Report
 Tell the user:
 - Video title
@@ -101,3 +114,4 @@ Tell the user:
 - Whether enriched transcript was available
 - Number of graph nodes and edges
 - How to open the graph: open `<CHANNEL_DIR>/graph.html` in a browser
+- If --obsidian was set: number of Obsidian notes created and path to `<CHANNEL_DIR>/obsidian/`
