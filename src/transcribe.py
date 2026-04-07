@@ -100,6 +100,7 @@ def main():
 
     metadata = get_metadata(args.url)
     metadata["id"] = video_id
+    metadata["url"] = f"https://www.youtube.com/watch?v={video_id}"
 
     channel_name = sanitize_filename(metadata["channel"]).replace(" ", "_").lower()
     base_dir = os.path.join("vault", "content", channel_name)

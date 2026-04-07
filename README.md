@@ -85,16 +85,42 @@ Then use the `--engine` flag:
 
 Speaker diarization requires a [HuggingFace token](https://huggingface.co/settings/tokens) set as `HF_TOKEN` in your environment. Without it, WhisperX still produces timestamped segments but without speaker labels.
 
+## Obsidian integration
+
+Add `--obsidian` to export the knowledge graph directly into your Obsidian vault.
+
+```
+/process --obsidian https://www.youtube.com/watch?v=VIDEO_ID
+```
+
+This generates one `.md` file per extracted entity in `vault/content/<channel_name>/obsidian/`. Each file contains:
+
+- **YAML frontmatter** — tags, source title, URL, channel
+- **Relations** — outgoing links to other entities: `- made_by: [[Anthropic]]`
+- **Referenced by** — incoming links: `- [[Claude]] → made_by`
+
+Wikilinks use Obsidian's `[[filename|display]]` aliasing, so they resolve correctly even when entity names contain special characters.
+
+To connect the exported notes to your main vault, point Obsidian at the `vault/` folder or copy the `obsidian/` directory into your existing vault.
+
+You can also run the exporter directly:
+
+```bash
+python src/obsidian_exporter.py vault/content/<channel>/triplets.json /path/to/output \
+  --metadata vault/content/<channel>/raw/metadata.json
+```
+
 ## Options
 
 ```
-/process [--depth light|standard|deep] [--engine whisperx|whisper] <URL>
+/process [--depth light|standard|deep] [--engine whisperx|whisper] [--obsidian] <URL>
 ```
 
 | Flag | Values | Default | Effect |
 |------|--------|---------|--------|
 | `--depth` | `light`, `standard`, `deep` | `standard` | Controls triplet count and summary detail |
 | `--engine` | `whisper`, `whisperx` | `whisper` | Selects transcription engine for fallback |
+| `--obsidian` | — | off | Exports entity notes to `obsidian/` subfolder |
 
 Examples:
 
@@ -102,6 +128,8 @@ Examples:
 /process https://www.youtube.com/watch?v=VIDEO_ID
 /process --depth deep https://www.youtube.com/watch?v=VIDEO_ID
 /process --engine whisperx --depth light https://www.youtube.com/watch?v=VIDEO_ID
+/process --obsidian https://www.youtube.com/watch?v=VIDEO_ID
+/process --obsidian --depth deep https://www.youtube.com/watch?v=VIDEO_ID
 ```
 
 ## License

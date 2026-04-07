@@ -43,7 +43,7 @@ def main():
         print(f"SKIPPED_DUPLICATE: {video_id} already in database.")
         sys.exit(0)
 
-    metadata = {"channel": "Unknown_Channel", "title": "Unknown_Title", "id": video_id, "language": "unknown"}
+    metadata = {"channel": "Unknown_Channel", "title": "Unknown_Title", "id": video_id, "url": f"https://www.youtube.com/watch?v={video_id}", "language": "unknown"}
     try:
         with YoutubeDL({"quiet": True, "no_warnings": True}) as ydl:
             info = ydl.extract_info(args.url, download=False)
