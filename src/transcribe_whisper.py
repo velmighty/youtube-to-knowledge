@@ -82,11 +82,12 @@ def main():
     with open(os.path.join(raw_dir, "metadata.json"), "w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False, indent=2)
 
-    with open(os.path.join(raw_dir, "transcript_raw.txt"), "w", encoding="utf-8") as f:
+    raw_filename = f"transcript_{video_id}.txt"
+    with open(os.path.join(raw_dir, raw_filename), "w", encoding="utf-8") as f:
         f.write(transcript)
 
     print(f"CHANNEL_DIR:{base_dir}")
-    print(f"RAW_FILE:{os.path.join(raw_dir, 'transcript_raw.txt')}")
+    print(f"RAW_FILE:{os.path.join(raw_dir, raw_filename)}")
     print(f"SOURCE_LANG:{lang}")
     print(f"TITLE:{metadata['title']}")
 
