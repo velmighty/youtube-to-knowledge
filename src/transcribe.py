@@ -115,7 +115,7 @@ def main():
 
     metadata["language"] = lang
 
-    with open(os.path.join(raw_dir, "metadata.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(raw_dir, f"metadata_{video_id}.json"), "w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False, indent=2)
 
     raw_filename = f"transcript_{video_id}.txt"

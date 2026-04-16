@@ -12,20 +12,21 @@ def build_database(vault_dir: Path, output_file: Path) -> int:
     for item in vault_dir.iterdir():
         if not item.is_dir():
             continue
-        metadata_path = item / "raw" / "metadata.json"
-        if not metadata_path.exists():
+        raw_dir = item / "raw"
+        if not raw_dir.exists():
             continue
-        try:
-            with open(metadata_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            videos.append({
-                "channel": data.get("channel", "Unknown"),
-                "title": data.get("title", "Unknown"),
-                "id": data.get("id", ""),
-                "language": data.get("language", "unknown"),
-            })
-        except Exception as e:
-            print(f"Warning: could not read {metadata_path}: {e}")
+        for metadata_path in sorted(raw_dir.glob("metadata_*.json")):
+            try:
+                with open(metadata_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                videos.append({
+                    "channel": data.get("channel", "Unknown"),
+                    "title": data.get("title", "Unknown"),
+                    "id": data.get("id", ""),
+                    "language": data.get("language", "unknown"),
+                })
+            except Exception as e:
+                print(f"Warning: could not read {metadata_path}: {e}")
 
     videos.sort(key=lambda v: v["channel"].lower())
 

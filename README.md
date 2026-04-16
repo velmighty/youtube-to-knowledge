@@ -41,6 +41,19 @@ Open the folder in Claude Code.
 /process https://www.youtube.com/watch?v=VIDEO_ID
 ```
 
+Process multiple videos at once:
+
+```
+/process https://youtube.com/watch?v=abc https://youtube.com/watch?v=def
+```
+
+Process an entire playlist:
+
+```
+/process https://www.youtube.com/playlist?list=PLxxx
+```
+
+Already-processed videos are skipped automatically.
 
 Additional commands:
 
@@ -53,13 +66,15 @@ Files are saved to `vault/content/<channel_name>/`:
 
 ```
 raw/
-  transcript_raw.txt    raw transcript
-  metadata.json         title, channel, video ID, language
-summary.md              structured summary
-triplets.json           knowledge graph source data
-graph.json              graph in node-link format
-graph.html              open in browser — interactive visualization
+  transcript_<video_id>.txt    raw transcript
+  metadata_<video_id>.json     title, channel, video ID, language
+summary_<video_id>.md          structured summary
+triplets_<video_id>.json       knowledge graph source data (per video)
+graph.json                     cumulative graph in node-link format
+graph.html                     open in browser — interactive visualization
 ```
+
+Each file is named after the video ID, so multiple videos from the same channel are stored without overwriting each other.
 
 ## Transcription modes
 
@@ -112,14 +127,14 @@ To connect the exported notes to your main vault, point Obsidian at the `vault/`
 You can also run the exporter directly:
 
 ```bash
-python src/obsidian_exporter.py vault/content/<channel>/triplets.json /path/to/output \
-  --metadata vault/content/<channel>/raw/metadata.json
+python src/obsidian_exporter.py vault/content/<channel>/triplets_<video_id>.json /path/to/output \
+  --metadata vault/content/<channel>/raw/metadata_<video_id>.json
 ```
 
 ## Options
 
 ```
-/process [--depth light|standard|deep] [--engine whisperx|whisper] [--obsidian] <URL>
+/process [--depth light|standard|deep] [--engine whisperx|whisper] [--obsidian] <URL> [<URL2> ...]
 ```
 
 | Flag | Values | Default | Effect |
@@ -128,10 +143,14 @@ python src/obsidian_exporter.py vault/content/<channel>/triplets.json /path/to/o
 | `--engine` | `whisper`, `whisperx` | `whisper` | Selects transcription engine for fallback |
 | `--obsidian` | — | off | Exports entity notes to `obsidian/` subfolder |
 
+Flags apply to all videos in a batch.
+
 Examples:
 
 ```
 /process https://www.youtube.com/watch?v=VIDEO_ID
+/process https://youtube.com/watch?v=abc https://youtube.com/watch?v=def
+/process https://www.youtube.com/playlist?list=PLxxx
 /process --depth deep https://www.youtube.com/watch?v=VIDEO_ID
 /process --engine whisperx --depth light https://www.youtube.com/watch?v=VIDEO_ID
 /process --obsidian https://www.youtube.com/watch?v=VIDEO_ID

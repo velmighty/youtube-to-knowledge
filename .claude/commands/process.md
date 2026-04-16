@@ -1,23 +1,32 @@
-Process a YouTube video into structured knowledge.
+Process one or more YouTube videos (or a playlist) into structured knowledge.
 
 **Arguments:** $ARGUMENTS
 
 Parse `$ARGUMENTS` to extract:
-- **URL**: The argument that starts with `http` or looks like a YouTube video ID.
+- **URLs**: All arguments that start with `http` or look like YouTube video IDs. There may be one or many.
+- **Playlist**: If a URL contains `playlist?list=`, it is a playlist — expand it first (see Step 0).
 - **--depth**: `light` | `standard` | `deep` (default: `standard`).
 - **--engine**: `whisperx` | `whisper` (default: `whisper`).
 - **--obsidian**: flag (no value). If present, export entities as Obsidian markdown notes.
 
 Examples:
 - `/process https://youtube.com/watch?v=xyz`
+- `/process https://youtube.com/watch?v=abc https://youtube.com/watch?v=def`
+- `/process https://www.youtube.com/playlist?list=PLxxx`
 - `/process --depth deep https://youtube.com/watch?v=xyz`
-- `/process --engine whisper --depth light https://youtube.com/watch?v=xyz`
 - `/process --obsidian https://youtube.com/watch?v=xyz`
 
 Follow these steps exactly:
 
+## Step 0 — Expand playlist (only if a playlist URL was given)
+Run: `python src/playlist_extractor.py <playlist_url>`
+
+Each line of stdout is a video URL. Replace the playlist URL in your working list with these individual URLs. Proceed to Step 1 for each video sequentially.
+
 ## Step 1 — Duplicate check
-Read `vault/processed_videos.md`. Extract the video ID from the URL. If the ID appears in the file, stop and tell the user the video is already processed.
+**If processing multiple videos:** announce "Processing X videos" before starting.
+
+Read `vault/processed_videos.md`. Extract the video ID from the URL. If the ID appears in the file, skip this video (print "SKIPPED: already processed") and move to the next one.
 
 ## Step 2 — Transcription
 Run: `python src/transcribe.py <URL>`
@@ -39,7 +48,7 @@ Parse the same output variables from whichever script succeeds.
 ## Step 3 — Summary
 Read the transcript. **If ENRICHED_FILE was provided, read it instead of RAW_FILE** for richer context (timestamps, speaker labels). Otherwise read RAW_FILE.
 
-Write a structured summary to `<CHANNEL_DIR>/summary.md`:
+Write a structured summary to `<CHANNEL_DIR>/summary_<video_id>.md`:
 - Title and channel at the top.
 - Write in the same language as the transcript (use SOURCE_LANG to detect).
 
@@ -82,7 +91,7 @@ Extract 25-35 triplets. Include:
 - Attributed claims (use speaker name if from diarized transcript)
 - Quantitative relationships ("X grew by 300%")
 
-Save to `<CHANNEL_DIR>/triplets.json`:
+Save to `<CHANNEL_DIR>/triplets_<video_id>.json`:
 ```json
 [
   {"subject": "Entity A", "predicate": "relation", "object": "Entity B"},
@@ -90,7 +99,7 @@ Save to `<CHANNEL_DIR>/triplets.json`:
 ]
 ```
 
-Then run: `python src/graph_extractor.py <CHANNEL_DIR> <CHANNEL_DIR>/triplets.json`
+Then run: `python src/graph_extractor.py <CHANNEL_DIR> <CHANNEL_DIR>/triplets_<video_id>.json`
 
 ## Step 5 — Update database
 Run: `python src/generate_video_db.py`
@@ -101,13 +110,13 @@ Read `<CHANNEL_DIR>/raw/metadata.json`.
 
 Run:
 ```
-python src/obsidian_exporter.py <CHANNEL_DIR>/triplets.json <CHANNEL_DIR>/obsidian --metadata <CHANNEL_DIR>/raw/metadata.json
+python src/obsidian_exporter.py <CHANNEL_DIR>/triplets_<video_id>.json <CHANNEL_DIR>/obsidian --metadata <CHANNEL_DIR>/raw/metadata_<video_id>.json
 ```
 
 This creates one `.md` file per entity in `<CHANNEL_DIR>/obsidian/`, with `[[wikilinks]]` between related entities.
 
 ## Step 6 — Report
-Tell the user:
+**If a single video was processed:**
 - Video title
 - Depth level used
 - Files created (transcript, summary, graph.html path)
@@ -115,3 +124,8 @@ Tell the user:
 - Number of graph nodes and edges
 - How to open the graph: open `<CHANNEL_DIR>/graph.html` in a browser
 - If --obsidian was set: number of Obsidian notes created and path to `<CHANNEL_DIR>/obsidian/`
+
+**If multiple videos were processed:**
+- Summary table: one row per video with title, channel, status (processed / skipped)
+- Total processed vs skipped
+- List of graph.html paths to open
