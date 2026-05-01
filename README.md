@@ -25,6 +25,13 @@ Paste a link. Get structured knowledge.
 | Fedora | `sudo dnf install ffmpeg` |
 | Windows | `winget install ffmpeg` |
 
+### Install spaCy (for enhanced entity extraction)
+
+```bash
+pip install spacy
+python -m spacy download en_core_web_sm
+```
+
 ## Setup
 
 ```bash
@@ -52,7 +59,11 @@ Process an entire playlist:
 ```
 /process https://www.youtube.com/playlist?list=PLxxx
 ```
+Use enhanced NLP-based entity extraction (faster, no API calls):
 
+```
+/process --enhanced https://www.youtube.com/watch?v=VIDEO_ID
+```
 Already-processed videos are skipped automatically.
 
 Additional commands:
