@@ -7,6 +7,7 @@ Parse `$ARGUMENTS` to extract:
 - **Playlist**: If a URL contains `playlist?list=`, it is a playlist — expand it first (see Step 0).
 - **--depth**: `light` | `standard` | `deep` (default: `standard`).
 - **--engine**: `whisperx` | `whisper` (default: `whisper`).
+- **--enhanced**: flag (no value). If present, use enhanced NLP-based entity extraction with spaCy.
 - **--obsidian**: flag (no value). If present, export entities as Obsidian markdown notes.
 
 Examples:
@@ -14,6 +15,7 @@ Examples:
 - `/process https://youtube.com/watch?v=abc https://youtube.com/watch?v=def`
 - `/process https://www.youtube.com/playlist?list=PLxxx`
 - `/process --depth deep https://youtube.com/watch?v=xyz`
+- `/process --enhanced https://youtube.com/watch?v=xyz`
 - `/process --obsidian https://youtube.com/watch?v=xyz`
 
 Follow these steps exactly:
@@ -71,6 +73,19 @@ Write a structured summary to `<CHANNEL_DIR>/summary_<video_id>.md`:
 
 ## Step 4 — Knowledge graph
 Extract triplets from the transcript (prefer enriched transcript if available).
+
+**If --enhanced flag is NOT set:**
+Use Claude AI extraction as described below.
+
+**If --enhanced flag IS set:**
+Run: `python src/enhanced_entity_extractor.py <RAW_FILE> --output <CHANNEL_DIR>/triplets_<video_id>.json --max-triplets <N>`
+
+Where <N> is:
+- 12 for light depth
+- 20 for standard depth
+- 35 for deep depth
+
+Then optionally enhance with Claude AI for more complex relationships.
 
 **Entity resolution (all depths):**
 - Use full canonical names. Check metadata.json for speaker/channel.

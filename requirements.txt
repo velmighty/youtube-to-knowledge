@@ -4,3 +4,4 @@ openai-whisper>=20231117
 torch>=2.0.0
 networkx>=3.0
 pyvis>=0.3.2
+spacy>=3.7.0
